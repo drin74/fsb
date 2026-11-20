@@ -101,3 +101,34 @@ cd mobile
 
 
 & "C:\Users\Arman bshsoan\AppData\Local\Python\pythoncore-3.14-64\python.exe" "main.py"
+
+/
+/
+/
+/
+///////
+/
+"C:\Users\Arman bshsoan\AppData\Local\Python\pythoncore-3.14-64\python.exe" "main.py"
+//
+/
+/
+/
+/
+//Откройте PowerShell/терминал в корне проекта FSB\ и выполните:
+docker compose up -d --build
+Это поднимет MySQL (3308), Redis (6379) и backend+Django (8010). При старте бэкенда автоматически выполняются миграции и seed_demo.
+Проверка: откройте в браузере http://127.0.0.1:8010/
+Вход (демо): admin / Admin123! (также operator/Operator123!, analyst/Analyst123!, viewer/Viewer123!).
+Остановка: docker compose down (данные БД сохраняются в volume fsb_mysql_data).
+Если бэкенд/БД нужны с доступом из сети, убедитесь, что открыт порт 8010/TCP в брандмауэре и в настройках разрешены нужные хосты (в compose сейчас DJANGO_ALLOWED_HOSTS=*).
+
+3) Десктоп-клиент (CustomTkinter)
+Нужно: Python 3.11+ (Windows).
+
+Установите зависимости и запустите из папки desktop:
+cd FSB\desktop
+python -m pip install -r requirements.txt
+python main.py
+Адрес API берётся из desktop\config.json (api_base). По умолчанию: http://127.0.0.1:8010/api.
+Если бэкенд работает на этом же ПК — менять не нужно.
+Если бэкенд на другом ПК/сервере — замените на http://<IP_сервера>:8010/api.
