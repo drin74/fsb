@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}Сводка{% endblock %}
+{% block eyebrow %}Оперативная информация{% endblock %}
+{% block page_title %}Сводка{% endblock %}
+{% block topbar_actions %}
+<a class="btn btn--ghost" href="{% url 'client_import' %}">Импорт</a>
+<a class="btn btn--primary" href="{% url 'client_create' %}">+ Новая запись</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid--stats">
+    <div class="stat-card">
+        <div class="stat-card__label">Всего записей</div>
+        <div class="stat-card__value">{{ stats.total }}</div>
+        <div class="stat-card__meta"><span class="dot dot--info"></span> активный реестр</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__label">Новые за 7 дней</div>
+        <div class="stat-card__value">+{{ stats.new_week }}</div>
+        <div class="stat-card__meta"><span class="dot dot--ok"></span> динамика пополнения</div>
+    </div>
+    <div class="stat-card stat-card--warn">
+        <div class="stat-card__label">На проверке</div>
+        <div class="stat-card__value">{{ stats.checking }}</div>
+        <div class="stat-card__meta"><span class="dot dot--warn"></span> требуют решения</div>
+    </div>
+    <div class="stat-card stat-card--danger">
+        <div class="stat-card__label">Высокий риск</div>
+        <div class="stat-card__value">{{ stats.high_risk }}</div>
+        <div class="stat-card__meta"><span class="dot dot--danger"></span> усиленный контроль</div>
+    </div>
+</div>
+
+<div class="grid grid--2">
+    <section class="panel">
+        <header class="panel__head">
+            <div>
+                <div class="panel__eyebrow">Распределение</div>
+                <h2>Статусы записей</h2>
+            </div>
+            <span class="panel__hint">Всего {{ stats.total }}</span>
+        </header>
+        <div class="bars">
+            {% for bar in status_bars %}
+            <div class="bar-row">
+                <div class="bar-row__top">
+                    <span class="badge badge--{{ bar.code }}">{{ bar.label }}</span>
+                    <strong>{{ bar.count }}</strong>
+                </div>
+                <div class="bar"><span class="bar__fill bar__fill--{{ bar.tone }}" style="width: {{ bar.percent }}%"></span></div>
+            </div>
+            {% empty %}
+            <p class="muted">Данных пока нет.</p>
+            {% endfor %}
+        </div>
+        <div class="panel__foot">
+            <a href="{% url 'client_list' %}">Открыть реестр →</a>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel__head">
+            <div>
+                <div class="panel__eyebrow">Контроль</div>
+                <h2>Уровни риска</h2>
+            </div>
+            <a class="panel__link" href="{% url 'client_list' %}?risk_level=high">Высокий риск →</a>
+        </header>
+        <div class="bars">
+            {% for bar in risk_bars %}
+            <div class="bar-row">
+                <div class="bar-row__top">
+                    <span class="badge badge--risk-{{ bar.code }}">{{ bar.label }}</span>
+                    <strong>{{ bar.count }}</strong>
+                </div>
+                <div class="bar"><span class="bar__fill bar__fill--{{ bar.tone }}" style="width: {{ bar.percent }}%"></span></div>
+            </div>
+            {% empty %}
+            <p class="muted">Данных пока нет.</p>
+            {% endfor %}
+        </div>
+        <div class="panel__foot">
+            <a href="{% url 'reports' %}">Аналитика и отчёты →</a>
+        </div>
+    </section>
+</div>
+
+<div class="grid grid--main">
+    <section class="panel">
+        <header class="panel__head">
+            <div>
+                <div class="panel__eyebrow">Последние поступления</div>
+                <h2>Новые записи</h2>
+            </div>
+            <a class="panel__link" href="{% url 'client_list' %}">Все записи →</a>
+        </header>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Запись</th>
+                    <th>Дата рождения</th>
+                    <th>Статус</th>
+                    <th>Риск</th>
+                    <th>Источник</th>
+                    <th>Добавлено</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for client in recent_clients %}
+                <tr>
+                    <td><a class="link-strong" href="{% url 'client_detail' client.pk %}">{{ client.full_name }}</a><small class="cell-sub">{{ client.phone|default:"контакты не указаны" }}</small></td>
+                    <td>{{ client.birth_date|date:"d.m.Y"|default:"—" }}</td>
+                    <td><span class="badge badge--{{ client.status }}">{{ client.get_status_display }}</span></td>
+                    <td><span class="badge badge--risk-{{ client.risk_level }}">{{ client.get_risk_level_display }}</span></td>
+                    <td>{{ client.source.name|default:"Ручной ввод" }}</td>
+                    <td class="muted">{{ client.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="empty">Записей пока нет. Добавьте первую запись или выполните импорт.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel__head">
+            <div>
+                <div class="panel__eyebrow">Хроника</div>
+                <h2>События</h2>
+            </div>
+            <a class="panel__link" href="{% url 'audit' %}">Аудит →</a>
+        </header>
+        <div class="timeline">
+            {% for event in recent_events %}
+            <div class="timeline__item">
+                <span class="timeline__dot timeline__dot--{{ event.event_type }}"></span>
+                <div>
+                    <a class="link-strong" href="{% url 'client_detail' event.client.pk %}">{{ event.client.short_name }}</a>
+                    <div>{{ event.title }}</div>
+                    <small>{{ event.occurred_at|date:"d.m.Y H:i" }} · {{ event.created_by.display_name|default:"система" }}</small>
+                </div>
+            </div>
+            {% empty %}
+            <p class="muted">События появятся после первых действий.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<div class="grid grid--2">
+    <section class="panel">
+        <header class="panel__head">
+            <div>
+                <div class="panel__eyebrow">Быстрые действия</div>
+                <h2>Операции</h2>
+            </div>
+        </header>
+        <div class="quick">
+            <a class="quick__item" href="{% url 'client_create' %}"><span>+</span><strong>Добавить запись</strong><small>Карточка физического лица</small></a>
+            <a class="quick__item" href="{% url 'client_import' %}"><span>⇪</span><strong>Импорт CSV / XLSX</strong><small>Массовая загрузка реестра</small></a>
+            <a class="quick__item" href="{% url 'client_export' %}"><span>⇩</span><strong>Экспорт реестра</strong><small>Выгрузка в CSV</small></a>
+            <a class="quick__item" href="{% url 'reports' %}"><span>▤</span><strong>Отчёты</strong><small>Сводка по рискам</small></a>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel__head">
+            <div>
+                <div class="panel__eyebrow">Контроль доступа</div>
+                <h2>Последние действия</h2>
+            </div>
+            <a class="panel__link" href="{% url 'audit' %}">Журнал →</a>
+        </header>
+        <div class="log-list">
+            {% for log in recent_audit %}
+            <div class="log-list__row">
+                <span class="log-badge log-badge--{{ log.action }}">{{ log.get_action_display }}</span>
+                <span>{{ log.object_repr|default:log.model_name|truncatechars:44 }}</span>
+                <small>{{ log.user.display_name|default:"система" }} · {{ log.created_at|date:"H:i" }}</small>
+            </div>
+            {% empty %}
+            <p class="muted">Журнал пуст.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

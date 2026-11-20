@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Журнал аудита{% endblock %}
+{% block eyebrow %}Контроль доступа{% endblock %}
+{% block page_title %}Журнал аудита{% endblock %}
+
+{% block content %}
+<section class="panel panel--filters">
+    <form method="get" class="filters">
+        <label class="field field--grow">
+            <span>Поиск</span>
+            <input class="input" type="search" name="search" value="{{ search }}" placeholder="Объект, сотрудник, модель">
+        </label>
+        <label class="field">
+            <span>Действие</span>
+            <select class="input select" name="action">
+                <option value="">Все действия</option>
+                {% for code, label in action_choices %}
+                <option value="{{ code }}" {% if action == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="filters__actions">
+            <button class="btn btn--primary" type="submit">Применить</button>
+            <a class="btn btn--ghost" href="{% url 'audit' %}">Сбросить</a>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <header class="panel__head">
+        <div><div class="panel__eyebrow">Записей: {{ total }}</div><h2>Действия сотрудников</h2></div>
+        <span class="panel__hint">Хранится бессрочно</span>
+    </header>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+            <tr><th>Время</th><th>Сотрудник</th><th>Действие</th><th>Объект</th><th>Модель</th><th>IP</th><th>Детали</th></tr>
+            </thead>
+            <tbody>
+            {% for log in page_obj %}
+            <tr>
+                <td class="mono muted">{{ log.created_at|date:"d.m.Y H:i:s" }}</td>
+                <td>{{ log.user.display_name|default:"система" }}<small class="cell-sub">{{ log.user.username|default:"—" }}</small></td>
+                <td><span class="log-badge log-badge--{{ log.action }}">{{ log.get_action_display }}</span></td>
+                <td>{{ log.object_repr|default:"—"|truncatechars:48 }}<small class="cell-sub">ID {{ log.object_id|default:"—" }}</small></td>
+                <td class="mono">{{ log.model_name|default:"—" }}</td>
+                <td class="mono muted">{{ log.ip|default:"—" }}</td>
+                <td class="muted">{{ log.details|default_if_none:"" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="empty">Записи отсутствуют.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

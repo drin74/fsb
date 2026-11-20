@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block title %}{{ client.full_name }}{% endblock %}
+{% block eyebrow %}Карточка записи · ID {{ client.pk }}{% endblock %}
+{% block page_title %}{{ client.short_name }}{% endblock %}
+{% block topbar_actions %}
+<a class="btn btn--ghost" href="{% url 'client_list' %}">← К реестру</a>
+{% if request.user.can_edit %}
+<a class="btn btn--primary" href="{% url 'client_edit' client.pk %}">Редактировать</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="profile-head">
+    <div class="profile-head__avatar">{{ client.last_name|slice:":1"|upper }}{{ client.first_name|slice:":1"|upper }}</div>
+    <div class="profile-head__main">
+        <div class="profile-head__badges">
+            <span class="badge badge--{{ client.status }}">{{ client.get_status_display }}</span>
+            <span class="badge badge--risk-{{ client.risk_level }}">Риск: {{ client.get_risk_level_display }}</span>
+            {% for tag in client.tag_list %}<span class="tag">{{ tag }}</span>{% endfor %}
+        </div>
+        <h2>{{ client.full_name }}</h2>
+        <div class="profile-head__meta">
+            <span>{{ client.get_gender_display|default:"пол не указан" }}</span>
+            <span>{{ client.birth_date|date:"d.m.Y"|default:"дата рождения не указана" }}{% if client.age %} · {{ client.age }} лет{% endif %}</span>
+            <span>{{ client.citizenship|default:"гражданство не указано" }}</span>
+            <span>Источник: {{ client.source.name|default:"ручной ввод" }}</span>
+        </div>
+    </div>
+    <div class="profile-head__side">
+        <div class="profile-head__row"><span>Создано</span><strong>{{ client.created_at|date:"d.m.Y H:i" }}</strong></div>
+        <div class="profile-head__row"><span>Автор</span><strong>{{ client.created_by.display_name|default:"система" }}</strong></div>
+        <div class="profile-head__row"><span>Обновлено</span><strong>{{ client.updated_at|date:"d.m.Y H:i" }}</strong></div>
+        {% if request.user.can_edit %}
+        <form method="post" action="{% url 'client_delete' client.pk %}" onsubmit="return confirm('Переместить запись в архив?');">
+            {% csrf_token %}
+            <button class="btn btn--danger btn--block" type="submit">В архив</button>
+        </form>
+        {% endif %}
+    </div>
+</section>
+
+<div class="grid grid--detail">
+    <aside class="panel panel--facts">
+        <header class="panel__head"><div><div class="panel__eyebrow">Анкета</div><h2>Основные сведения</h2></div></header>
+        <dl class="facts">
+            <div><dt>Дата рождения</dt><dd>{{ client.birth_date|date:"d.m.Y"|default:"—" }}</dd></div>
+            <div><dt>ИНН</dt><dd class="mono">{{ client.inn|default:"—" }}</dd></div>
+            <div><dt>СНИЛС</dt><dd class="mono">{{ client.snils|default:"—" }}</dd></div>
+            <div><dt>Паспорт</dt><dd class="mono">{{ client.passport_series|default:"—" }} {{ client.passport_number }}</dd></div>
+            <div><dt>Кем выдан</dt><dd>{{ client.passport_issued_by|default:"—" }}</dd></div>
+            <div><dt>Телефон</dt><dd>{{ client.phone|default:"—" }}</dd></div>
+            <div><dt>Email</dt><dd>{{ client.email|default:"—" }}</dd></div>
+            <div><dt>Регистрация</dt><dd>{{ client.address_registration|default:"—" }}</dd></div>
+            <div><dt>Проживание</dt><dd>{{ client.address_actual|default:"—" }}</dd></div>
+        </dl>
+        {% if client.notes %}
+        <div class="panel__note">
+            <strong>Примечание</strong>
+            <p>{{ client.notes|linebreaksbr }}</p>
+        </div>
+        {% endif %}
+    </aside>
+
+    <section class="panel panel--tabs">
+        <nav class="tabs" data-tabs>
+            <button class="tabs__btn is-active" data-tab="overview">Обзор</button>
+            <button class="tabs__btn" data-tab="events">События <span class="tabs__count">{{ events|length }}</span></button>
+            <button class="tabs__btn" data-tab="documents">Документы <span class="tabs__count">{{ documents|length }}</span></button>
+            <button class="tabs__btn" data-tab="consents">Согласия <span class="tabs__count">{{ consents|length }}</span></button>
+        </nav>
+
+        <div class="tab-panel is-active" data-panel="overview">
+            <div class="grid grid--2">
+                <section class="subpanel" id="contacts">
+                    <header class="subpanel__head"><h3>Контакты</h3><span>{{ contacts|length }}</span></header>
+                    <div class="list">
+                        {% for contact in contacts %}
+                        <div class="list__row">
+                            <span class="contact-kind">{{ contact.get_kind_display }}</span>
+                            <div><strong>{{ contact.value }}</strong>{% if contact.comment %}<small>{{ contact.comment }}</small>{% endif %}</div>
+                            {% if contact.is_primary %}<span class="tag">основной</span>{% endif %}
+                            {% if request.user.can_edit %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="contact_delete">
+                                <input type="hidden" name="contact_id" value="{{ contact.pk }}">
+                                <button class="icon-btn" type="submit" title="Удалить">×</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="muted">Контакты не добавлены.</p>
+                        {% endfor %}
+                    </div>
+                    {% if request.user.can_edit %}
+                    <form method="post" class="inline-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="contact_add">
+                        <div class="inline-form__grid">
+                            <label class="field"><span>Тип</span>{{ contact_form.kind }}</label>
+                            <label class="field field--grow"><span>Значение</span>{{ contact_form.value }}</label>
+                            <label class="field"><span>Комментарий</span>{{ contact_form.comment }}</label>
+                            <label class="field field--check">{{ contact_form.is_primary }}<span>Основной</span></label>
+                        </div>
+                        <button class="btn btn--secondary btn--sm" type="submit">Добавить контакт</button>
+                    </form>
+                    {% endif %}
+                </section>
+
+                <section class="subpanel" id="data">
+                    <header class="subpanel__head"><h3>Дополнительные сведения</h3><span>{{ data_items|length }}</span></header>
+                    <div class="list">
+                        {% for item in data_items %}
+                        <div class="list__row list__row--stack">
+                            <div>
+                                <span class="tag tag--muted">{{ item.get_category_display }}</span>
+                                <strong>{{ item.key }}</strong>
+                                <small>{{ item.value }}</small>
+                            </div>
+                            {% if item.verified %}<span class="badge badge--active">проверено</span>{% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="muted">Дополнительных сведений нет.</p>
+                        {% endfor %}
+                    </div>
+                    {% if request.user.can_edit %}
+                    <form method="post" class="inline-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="data_add">
+                        <div class="inline-form__grid">
+                            <label class="field"><span>Категория</span>{{ data_form.category }}</label>
+                            <label class="field"><span>Поле</span>{{ data_form.key }}</label>
+                            <label class="field field--grow"><span>Значение</span>{{ data_form.value }}</label>
+                        </div>
+                        <div class="inline-form__grid">
+                            <label class="field"><span>Источник</span>{{ data_form.source }}</label>
+                            <label class="field field--check">{{ data_form.verified }}<span>Проверено</span></label>
+                        </div>
+                        <button class="btn btn--secondary btn--sm" type="submit">Добавить сведение</button>
+                    </form>
+                    {% endif %}
+                </section>
+            </div>
+
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Согласия на обработку</h3><span>{{ consents|length }}</span></header>
+                <div class="list">
+                    {% for consent in consents %}
+                    <div class="list__row">
+                        <span class="badge {% if consent.granted %}badge--active{% else %}badge--blocked{% endif %}">{% if consent.granted %}получено{% else %}нет{% endif %}</span>
+                        <div><strong>{{ consent.consent_type }}</strong>{% if consent.valid_until %}<small>до {{ consent.valid_until|date:"d.m.Y" }}</small>{% endif %}</div>
+                    </div>
+                    {% empty %}<p class="muted">Согласия не зафиксированы.</p>{% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <div class="tab-panel" data-panel="events">
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Хроника событий</h3><span>{{ events|length }}</span></header>
+                <div class="timeline timeline--lg">
+                    {% for event in events %}
+                    <div class="timeline__item">
+                        <span class="timeline__dot timeline__dot--{{ event.event_type }}"></span>
+                        <div>
+                            <div class="timeline__title">{{ event.title }}</div>
+                            {% if event.description %}<p>{{ event.description }}</p>{% endif %}
+                            <small>{{ event.occurred_at|date:"d.m.Y H:i" }} · {{ event.get_event_type_display }} · {{ event.created_by.display_name|default:"система" }}{% if event.source %} · {{ event.source.name }}{% endif %}</small>
+                        </div>
+                    </div>
+                    {% empty %}<p class="muted">Событий пока нет.</p>{% endfor %}
+                </div>
+            </section>
+            {% if request.user.can_edit %}
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Добавить событие</h3></header>
+                <form method="post" class="form form--grid">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="event_add">
+                    <label class="field"><span>Тип</span>{{ event_form.event_type }}</label>
+                    <label class="field field--grow"><span>Заголовок</span>{{ event_form.title }}</label>
+                    <label class="field"><span>Дата и время</span>{{ event_form.occurred_at }}</label>
+                    <label class="field"><span>Источник</span>{{ event_form.source }}</label>
+                    <label class="field field--full"><span>Описание</span>{{ event_form.description }}</label>
+                    <button class="btn btn--secondary" type="submit">Сохранить событие</button>
+                </form>
+            </section>
+            {% endif %}
+        </div>
+
+        <div class="tab-panel" data-panel="documents">
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Документы</h3><span>{{ documents|length }}</span></header>
+                <div class="list">
+                    {% for document in documents %}
+                    <div class="list__row">
+                        <span class="file-icon">PDF</span>
+                        <div><strong>{{ document.title }}</strong><small>{{ document.doc_type|default:"документ" }} · {{ document.uploaded_at|date:"d.m.Y H:i" }} · {{ document.uploaded_by.display_name|default:"система" }}</small></div>
+                        <a class="btn btn--mini" href="{{ document.file.url }}" target="_blank" rel="noopener">Открыть</a>
+                    </div>
+                    {% empty %}<p class="muted">Документы не загружены.</p>{% endfor %}
+                </div>
+            </section>
+            {% if request.user.can_edit %}
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Загрузить документ</h3></header>
+                <form method="post" enctype="multipart/form-data" class="form form--grid">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="document_add">
+                    <label class="field field--grow"><span>Название</span>{{ document_form.title }}</label>
+                    <label class="field"><span>Тип</span>{{ document_form.doc_type }}</label>
+                    <label class="field field--full"><span>Файл</span>{{ document_form.file }}</label>
+                    <button class="btn btn--secondary" type="submit">Загрузить</button>
+                </form>
+            </section>
+            {% endif %}
+        </div>
+
+        <div class="tab-panel" data-panel="consents">
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Согласия</h3><span>{{ consents|length }}</span></header>
+                <div class="list">
+                    {% for consent in consents %}
+                    <div class="list__row list__row--stack">
+                        <div>
+                            <strong>{{ consent.consent_type }}</strong>
+                            <small>{% if consent.granted %}Получено{% else %}Не получено{% endif %}{% if consent.valid_until %} · до {{ consent.valid_until|date:"d.m.Y" }}{% endif %}{% if consent.comment %} · {{ consent.comment }}{% endif %}</small>
+                        </div>
+                    </div>
+                    {% empty %}<p class="muted">Согласия не зафиксированы.</p>{% endfor %}
+                </div>
+            </section>
+            {% if request.user.can_edit %}
+            <section class="subpanel">
+                <header class="subpanel__head"><h3>Зафиксировать согласие</h3></header>
+                <form method="post" class="form form--grid">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="consent_add">
+                    <label class="field field--grow"><span>Тип согласия</span>{{ consent_form.consent_type }}</label>
+                    <label class="field"><span>Действует до</span>{{ consent_form.valid_until }}</label>
+                    <label class="field field--check">{{ consent_form.granted }}<span>Согласие получено</span></label>
+                    <label class="field field--full"><span>Комментарий</span>{{ consent_form.comment }}</label>
+                    <button class="btn btn--secondary" type="submit">Сохранить</button>
+                </form>
+            </section>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

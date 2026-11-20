@@ -1,0 +1,19 @@
+{% if page_obj.has_other_pages %}
+<nav class="pagination">
+    <a class="pagination__btn {% if not page_obj.has_previous %}is-disabled{% endif %}"
+       href="?{{ querystring }}{% if querystring %}&{% endif %}page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}">← Назад</a>
+
+    <div class="pagination__pages">
+        {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <span class="pagination__page is-active">{{ num }}</span>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+            <a class="pagination__page" href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <a class="pagination__btn {% if not page_obj.has_next %}is-disabled{% endif %}"
+       href="?{{ querystring }}{% if querystring %}&{% endif %}page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}">Вперёд →</a>
+</nav>
+{% endif %}

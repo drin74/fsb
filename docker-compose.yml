@@ -1,0 +1,57 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: fsb-mysql
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: fsb_root_pass
+      MYSQL_DATABASE: fsb_db
+      MYSQL_USER: fsb_app
+      MYSQL_PASSWORD: fsb_app_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - fsb_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ufsb_app", "-pfsb_app_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    container_name: fsb-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: fsb-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DJANGO_SECRET_KEY: docker-dev-secret-key-2f8c1e
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      DB_ENGINE: mysql
+      DB_NAME: fsb_db
+      DB_USER: fsb_app
+      DB_PASSWORD: fsb_app_pass
+      DB_HOST: db
+      DB_PORT: "3306"
+      CORS_ALLOW_ALL_ORIGINS: "1"
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py seed_demo &&
+             python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+  fsb_mysql_data:

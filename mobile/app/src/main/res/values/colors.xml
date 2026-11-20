@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fsbbg">#080D12</color>
+    <color name="fsbbg_soft">#0A1118</color>
+    <color name="fsbpanel">#101922</color>
+    <color name="fsbpanel_2">#14202B</color>
+    <color name="fsbline">#21303E</color>
+    <color name="fsbtext">#E7EEF5</color>
+    <color name="fsbmuted">#8B9AA9</color>
+    <color name="fsbdim">#5A6B7B</color>
+    <color name="fsbgold">#D8B45F</color>
+    <color name="fsbcyan">#5BB8D6</color>
+    <color name="fsbgreen">#42B992</color>
+    <color name="fsbamber">#E0A83E</color>
+    <color name="fsbred">#E1675F</color>
+</resources>

@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Единый реестр{% endblock %} · ФСБ</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c141d'/><path d='M50 16l26 9v22c0 18-11 30-26 37-15-7-26-19-26-37V25z' fill='none' stroke='%23d7b45a' stroke-width='6'/><text x='50' y='60' font-size='26' text-anchor='middle' fill='%23d7b45a' font-family='Arial'>ФСБ</text></svg>">
+</head>
+<body class="app-body">
+<div class="app-shell">
+    <aside class="sidebar">
+        <a class="brand" href="{% url 'dashboard' %}">
+            <span class="brand__mark">
+                <svg viewBox="0 0 48 56" aria-hidden="true">
+                    <path d="M24 2 45 9v18c0 13-8.5 22.5-21 27C11.5 49.5 3 40 3 27V9L24 2Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+                    <path d="M24 9v34M14 18h20M14 27h20M14 36h20" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".65"/>
+                </svg>
+            </span>
+            <span class="brand__text">
+                <strong>ФСБ</strong>
+                <small>Единый реестр</small>
+            </span>
+        </a>
+
+        <div class="sidebar__section">Оперативная работа</div>
+        <nav class="nav">
+            <a class="nav__item {% if active_nav == 'dashboard' %}is-active{% endif %}" href="{% url 'dashboard' %}">
+                <span class="nav__num">01</span><span>Сводка</span>
+            </a>
+            <a class="nav__item {% if active_nav == 'clients' %}is-active{% endif %}" href="{% url 'client_list' %}">
+                <span class="nav__num">02</span><span>Реестр записей</span>
+                {% if nav_clients_count %}<span class="nav__count">{{ nav_clients_count }}</span>{% endif %}
+            </a>
+            <a class="nav__item {% if active_nav == 'sources' %}is-active{% endif %}" href="{% url 'sources' %}">
+                <span class="nav__num">03</span><span>Источники</span>
+            </a>
+            <a class="nav__item {% if active_nav == 'reports' %}is-active{% endif %}" href="{% url 'reports' %}">
+                <span class="nav__num">04</span><span>Отчёты</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__section">Контроль</div>
+        <nav class="nav">
+            <a class="nav__item {% if active_nav == 'audit' %}is-active{% endif %}" href="{% url 'audit' %}">
+                <span class="nav__num">05</span><span>Журнал аудита</span>
+            </a>
+            {% if request.user.is_superuser or request.user.role_code == 'admin' %}
+            <a class="nav__item {% if active_nav == 'users' %}is-active{% endif %}" href="{% url 'users' %}">
+                <span class="nav__num">06</span><span>Сотрудники</span>
+            </a>
+            {% endif %}
+            <a class="nav__item {% if active_nav == 'profile' %}is-active{% endif %}" href="{% url 'profile' %}">
+                <span class="nav__num">07</span><span>Профиль</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__foot">
+            <div class="user-chip">
+                <span class="user-chip__avatar">{{ request.user.display_name|slice:":1"|upper }}</span>
+                <span class="user-chip__meta">
+                    <strong>{{ request.user.display_name }}</strong>
+                    <small>{{ request.user.role.name|default:"Наблюдатель" }}</small>
+                </span>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="btn btn--ghost btn--block" type="submit">Выйти</button>
+            </form>
+            <div class="sidebar__note">FSB Registry · v1.0</div>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div>
+                <div class="topbar__eyebrow">{% block eyebrow %}Служебная информация{% endblock %}</div>
+                <h1 class="topbar__title">{% block page_title %}Сводка{% endblock %}</h1>
+            </div>
+            <div class="topbar__actions">
+                {% block topbar_actions %}{% endblock %}
+                <div class="topbar__clock" id="clock">--:--:--</div>
+                <div class="topbar__user">
+                    <span>{{ request.user.display_name }}</span>
+                    <small>{{ request.user.department|default:"Центральный аппарат" }}</small>
+                </div>
+            </div>
+        </header>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message message--{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="footer">
+            <span>Демонстрационный контур · персональные данные вымышлены</span>
+            <span>Доступ фиксируется в журнале аудита</span>
+        </footer>
+    </div>
+</div>
+<script src="{% static 'js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

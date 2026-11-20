@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Источники данных{% endblock %}
+{% block eyebrow %}Поступление информации{% endblock %}
+{% block page_title %}Источники данных{% endblock %}
+
+{% block content %}
+<div class="grid grid--sidebar">
+    <section class="panel">
+        <header class="panel__head">
+            <div><div class="panel__eyebrow">Каталог</div><h2>Подключённые источники</h2></div>
+            <span class="panel__hint">{{ items|length }}</span>
+        </header>
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Название</th><th>Тип</th><th>Записей</th><th>Статус</th><th>Создан</th></tr></thead>
+                <tbody>
+                {% for source in items %}
+                <tr>
+                    <td><strong>{{ source.name }}</strong>{% if source.url %}<small class="cell-sub"><a href="{{ source.url }}" target="_blank" rel="noopener">{{ source.url }}</a></small>{% endif %}</td>
+                    <td><span class="tag tag--muted">{{ source.get_kind_display }}</span></td>
+                    <td class="mono">{{ source.clients_count }}</td>
+                    <td><span class="badge {% if source.is_active %}badge--active{% else %}badge--inactive{% endif %}">{% if source.is_active %}активен{% else %}отключён{% endif %}</span></td>
+                    <td class="muted">{{ source.created_at|date:"d.m.Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty">Источники ещё не добавлены.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <header class="panel__head"><div><div class="panel__eyebrow">Новый источник</div><h2>Подключение</h2></div></header>
+        <form method="post" class="form">
+            {% csrf_token %}
+            {% for field in form %}
+            <label class="field {% if field.field.required %}field--required{% endif %}">
+                <span>{{ field.label }}</span>{{ field }}
+                {% if field.errors %}<em class="field__error">{{ field.errors.0 }}</em>{% endif %}
+            </label>
+            {% endfor %}
+            <button class="btn btn--primary" type="submit">Добавить источник</button>
+        </form>
+        <div class="panel__note">
+            <strong>Учёт</strong>
+            <p>Каждая запись хранит ссылку на источник. Это позволяет строить отчётность по каналам поступления.</p>
+        </div>
+    </aside>
+</div>
+{% endblock %}

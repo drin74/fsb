@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Импорт{% endblock %}
+{% block eyebrow %}Массовая загрузка{% endblock %}
+{% block page_title %}Импорт записей{% endblock %}
+
+{% block content %}
+<div class="grid grid--2">
+    <section class="panel">
+        <header class="panel__head">
+            <div><div class="panel__eyebrow">CSV / XLSX</div><h2>Загрузить файл</h2></div>
+        </header>
+        <form method="post" enctype="multipart/form-data" class="form">
+            {% csrf_token %}
+            <label class="field field--required"><span>{{ form.file.label }}</span>{{ form.file }}{% if form.file.errors %}<em class="field__error">{{ form.file.errors.0 }}</em>{% endif %}</label>
+            <label class="field"><span>{{ form.source.label }}</span>{{ form.source }}</label>
+            <button class="btn btn--primary" type="submit">Начать импорт</button>
+        </form>
+
+        {% if errors %}
+        <div class="message message--error">
+            <strong>Пропущенные строки:</strong>
+            <ul class="error-list">{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <header class="panel__head">
+            <div><div class="panel__eyebrow">Справка</div><h2>Формат файла</h2></div>
+            <a class="panel__link" href="{% static 'sample_import.csv' %}" download>Скачать шаблон →</a>
+        </header>
+        <p class="muted">Первая строка — заголовки. Поддерживаются UTF-8 и CP1251, разделитель <code>;</code> или <code>,</code>. Обязательные колонки — фамилия и имя.</p>
+        <div class="table-wrap">
+            <table class="table table--compact">
+                <thead><tr><th>Колонка</th><th>Обязательно</th><th>Пример</th></tr></thead>
+                <tbody>
+                <tr><td>Фамилия</td><td><span class="badge badge--active">да</span></td><td>Иванов</td></tr>
+                <tr><td>Имя</td><td><span class="badge badge--active">да</span></td><td>Иван</td></tr>
+                <tr><td>Отчество</td><td>—</td><td>Иванович</td></tr>
+                <tr><td>Дата рождения</td><td>—</td><td>12.04.1987</td></tr>
+                <tr><td>Телефон</td><td>—</td><td>+7 900 123-45-67</td></tr>
+                <tr><td>Email</td><td>—</td><td>ivanov@example.ru</td></tr>
+                <tr><td>ИНН / СНИЛС</td><td>—</td><td>770123456789</td></tr>
+                <tr><td>Статус</td><td>—</td><td>Активен, Наблюдение, На проверке</td></tr>
+                <tr><td>Риск</td><td>—</td><td>Низкий, Средний, Высокий</td></tr>
+                <tr><td>Метки</td><td>—</td><td>транспорт, наблюдение</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel__note">
+            <strong>Контроль</strong>
+            <p>Импорт фиксируется в журнале аудита. Дубликаты не удаляются автоматически — проверяйте ИНН и СНИЛС перед загрузкой.</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fsbbg">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/fsbbg_soft"
+        android:elevation="0dp"
+        android:theme="@style/Theme.FSB"
+        android:title="@string/client_archive_title"
+        android:titleTextColor="@color/fsbtext"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvFullName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ФСБ"
+                android:textColor="@color/fsbtext"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/layoutBadges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/fsbpanel_2"
+                    android:padding="8dp"
+                    android:textColor="@color/fsbtext"
+                    android:textSize="10.5sp"
+                    android:letterSpacing="0.04" />
+
+                <TextView
+                    android:id="@+id/tvRisk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@color/fsbpanel_2"
+                    android:padding="8dp"
+                    android:textColor="@color/fsbtext"
+                    android:textSize="10.5sp"
+                    android:letterSpacing="0.04" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/fsbmuted"
+                android:textSize="11.5sp" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                app:dividerColor="@color/fsbline" />
+
+            <TextView
+                android:id="@+id/tvContactsHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/client_contacts"
+                android:textColor="@color/fsbgold"
+                android:textSize="10.5sp"
+                android:letterSpacing="0.12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvContacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/fsbtext"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/tvEventsHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/client_events"
+                android:textColor="@color/fsbgold"
+                android:textSize="10.5sp"
+                android:letterSpacing="0.12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEvents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/fsbtext"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/tvDataHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/client_data"
+                android:textColor="@color/fsbgold"
+                android:textSize="10.5sp"
+                android:letterSpacing="0.12"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/fsbtext"
+                android:textSize="12.5sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btnAddContact"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="@string/add_contact" />
+
+                <Button
+                    android:id="@+id/btnAddEvent"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/add_event" />
+
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/client_edit" />
+
+                <Button
+                    android:id="@+id/btnArchive"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/client_archive"
+                    android:textColor="@color/fsbred" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/fsbgold"
+        android:minWidth="46dp"
+        android:minHeight="46dp"
+        android:text="←"
+        android:textColor="@color/fsbbg" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

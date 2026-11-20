@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Реестр записей{% endblock %}
+{% block eyebrow %}База данных{% endblock %}
+{% block page_title %}Реестр записей{% endblock %}
+{% block topbar_actions %}
+<a class="btn btn--ghost" href="{% url 'client_export' %}?{{ querystring }}">Экспорт CSV</a>
+<a class="btn btn--ghost" href="{% url 'client_import' %}">Импорт</a>
+<a class="btn btn--primary" href="{% url 'client_create' %}">+ Новая запись</a>
+{% endblock %}
+
+{% block content %}
+<section class="panel panel--filters">
+    <form method="get" class="filters">
+        <label class="field field--grow">
+            <span>Поиск</span>
+            <input class="input" type="search" name="search" value="{{ search }}" placeholder="ФИО, ИНН, СНИЛС, телефон, email">
+        </label>
+        <label class="field">
+            <span>Статус</span>
+            <select class="input select" name="status">
+                <option value="">Все статусы</option>
+                {% for code, label in status_choices %}
+                <option value="{{ code }}" {% if status == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="field">
+            <span>Риск</span>
+            <select class="input select" name="risk_level">
+                <option value="">Любой</option>
+                {% for code, label in risk_choices %}
+                <option value="{{ code }}" {% if risk_level == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="field">
+            <span>Сортировка</span>
+            <select class="input select" name="ordering">
+                <option value="-updated_at" {% if ordering == '-updated_at' %}selected{% endif %}>По обновлению</option>
+                <option value="-created_at" {% if ordering == '-created_at' %}selected{% endif %}>По дате добавления</option>
+                <option value="last_name" {% if ordering == 'last_name' %}selected{% endif %}>По фамилии</option>
+            </select>
+        </label>
+        <div class="filters__actions">
+            <button class="btn btn--primary" type="submit">Применить</button>
+            <a class="btn btn--ghost" href="{% url 'client_list' %}">Сбросить</a>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <header class="panel__head">
+        <div>
+            <div class="panel__eyebrow">Найдено: {{ total }}</div>
+            <h2>Карточки физических лиц</h2>
+        </div>
+        <span class="panel__hint">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    </header>
+
+    <div class="table-wrap">
+        <table class="table table--hover">
+            <thead>
+            <tr>
+                <th>Запись</th>
+                <th>Возраст</th>
+                <th>Контакты</th>
+                <th>Статус</th>
+                <th>Риск</th>
+                <th>Метки</th>
+                <th>Источник</th>
+                <th>Обновлено</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for client in page_obj %}
+            <tr>
+                <td>
+                    <a class="link-strong" href="{% url 'client_detail' client.pk %}">{{ client.full_name }}</a>
+                    <small class="cell-sub">{{ client.get_gender_display }}{% if client.birth_date %} · {{ client.birth_date|date:"d.m.Y" }}{% endif %}{% if client.inn %} · ИНН {{ client.inn }}{% endif %}</small>
+                </td>
+                <td>{{ client.age|default:"—" }}</td>
+                <td>
+                    {% with phone=client.contacts.all|first %}
+                    {{ phone.value|default:client.phone|default:"—" }}
+                    {% endwith %}
+                </td>
+                <td><span class="badge badge--{{ client.status }}">{{ client.get_status_display }}</span></td>
+                <td><span class="badge badge--risk-{{ client.risk_level }}">{{ client.get_risk_level_display }}</span></td>
+                <td>
+                    <div class="tags">
+                        {% for tag in client.tag_list|slice:":2" %}<span class="tag">{{ tag }}</span>{% endfor %}
+                        {% if not client.tag_list %}<span class="muted">—</span>{% endif %}
+                    </div>
+                </td>
+                <td>{{ client.source.name|default:"Ручной ввод" }}</td>
+                <td class="muted">{{ client.updated_at|date:"d.m.Y H:i" }}</td>
+                <td class="table__actions">
+                    <a class="btn btn--mini" href="{% url 'client_detail' client.pk %}">Открыть</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" class="empty">Ничего не найдено. Измените фильтры или добавьте новую запись.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

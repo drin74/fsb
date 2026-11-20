@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/fsbbg"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvAuditAction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Действие"
+        android:textColor="@color/fsbtext"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvAuditDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Детали"
+        android:textColor="@color/fsbmuted"
+        android:textSize="12.5sp" />
+
+    <TextView
+        android:id="@+id/tvAuditMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Метаданные"
+        android:textColor="@color/fsbdim"
+        android:textSize="11.5sp" />
+</LinearLayout>

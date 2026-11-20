@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Вход · ФСБ Единый реестр</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="auth-body">
+<div class="auth-grid">
+    <section class="auth-hero">
+        <div class="auth-hero__scan"></div>
+        <div class="auth-brand">
+            <span class="brand__mark brand__mark--lg">
+                <svg viewBox="0 0 48 56" aria-hidden="true">
+                    <path d="M24 2 45 9v18c0 13-8.5 22.5-21 27C11.5 49.5 3 40 3 27V9L24 2Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+                    <path d="M24 9v34M14 18h20M14 27h20M14 36h20" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".65"/>
+                </svg>
+            </span>
+            <div>
+                <strong>ФСБ</strong>
+                <small>Единый реестр</small>
+            </div>
+        </div>
+        <div class="auth-hero__body">
+            <div class="auth-kicker">Защищённый контур · служебный доступ</div>
+            <h1>Единая система учёта<br>и обработки данных</h1>
+            <p>Веб-интерфейс, настольное приложение и Android-клиент работают с общей базой MySQL через защищённый REST API.</p>
+            <div class="auth-features">
+                <div><span>01</span> Карточки и связи</div>
+                <div><span>02</span> Импорт CSV / XLSX</div>
+                <div><span>03</span> Полный аудит действий</div>
+            </div>
+        </div>
+        <div class="auth-hero__foot">
+            <span class="pulse"></span> Соединение защищено · TLS в промышленном контуре
+        </div>
+    </section>
+
+    <section class="auth-panel">
+        <div class="auth-panel__inner">
+            <div class="auth-kicker">Идентификация</div>
+            <h2>Вход в систему</h2>
+            <p class="auth-sub">Используйте служебную учётную запись. Все попытки входа фиксируются.</p>
+
+            {% if form.non_field_errors %}
+            <div class="message message--error">{{ form.non_field_errors.0 }}</div>
+            {% endif %}
+
+            <form method="post" class="form" autocomplete="off">
+                {% csrf_token %}
+                <label class="field">
+                    <span>{{ form.username.label }}</span>
+                    {{ form.username }}
+                    {% if form.username.errors %}<em class="field__error">{{ form.username.errors.0 }}</em>{% endif %}
+                </label>
+                <label class="field">
+                    <span>{{ form.password.label }}</span>
+                    {{ form.password }}
+                    {% if form.password.errors %}<em class="field__error">{{ form.password.errors.0 }}</em>{% endif %}
+                </label>
+                <button class="btn btn--primary btn--block" type="submit">Войти в реестр</button>
+            </form>
+
+            <div class="auth-demo">
+                <div class="auth-demo__title">Демонстрационные учётные записи</div>
+                <div class="auth-demo__row"><code>admin</code><span>Admin123!</span><em>администратор</em></div>
+                <div class="auth-demo__row"><code>operator</code><span>Operator123!</span><em>оператор</em></div>
+                <div class="auth-demo__row"><code>analyst</code><span>Analyst123!</span><em>аналитик</em></div>
+            </div>
+        </div>
+        <div class="auth-panel__foot">© 2026 · Учебный демонстрационный стенд</div>
+    </section>
+</div>
+</body>
+</html>

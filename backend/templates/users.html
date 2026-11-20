@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Сотрудники{% endblock %}
+{% block eyebrow %}Администрирование{% endblock %}
+{% block page_title %}Сотрудники{% endblock %}
+
+{% block content %}
+<div class="grid grid--sidebar">
+    <section class="panel">
+        <header class="panel__head">
+            <div><div class="panel__eyebrow">Учётные записи</div><h2>Доступ к системе</h2></div>
+            <span class="panel__hint">{{ items|length }}</span>
+        </header>
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Сотрудник</th><th>Логин</th><th>Роль</th><th>Подразделение</th><th>Статус</th><th>Последний вход</th><th></th></tr></thead>
+                <tbody>
+                {% for user in items %}
+                <tr>
+                    <td><strong>{{ user.display_name }}</strong><small class="cell-sub">{{ user.position|default:"должность не указана" }}</small></td>
+                    <td class="mono">{{ user.username }}</td>
+                    <td>
+                        {% if user.is_superuser %}<span class="badge badge--admin">Администратор</span>
+                        {% else %}<span class="tag tag--muted">{{ user.role.name|default:"Наблюдатель" }}</span>{% endif %}
+                    </td>
+                    <td>{{ user.department|default:"—" }}</td>
+                    <td><span class="badge {% if user.is_active %}badge--active{% else %}badge--blocked{% endif %}">{% if user.is_active %}активен{% else %}заблокирован{% endif %}</span></td>
+                    <td class="muted">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</td>
+                    <td class="table__actions">
+                        {% if user != request.user %}
+                        <form method="post" action="{% url 'user_toggle' user.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn--mini" type="submit">{% if user.is_active %}Блокировать{% else %}Разблокировать{% endif %}</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="empty">Сотрудники не найдены.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <header class="panel__head"><div><div class="panel__eyebrow">Новая учётная запись</div><h2>Добавить сотрудника</h2></div></header>
+        <form method="post" class="form">
+            {% csrf_token %}
+            {% for field in form %}
+            <label class="field {% if field.field.required %}field--required{% endif %}">
+                <span>{{ field.label }}</span>{{ field }}
+                {% if field.help_text %}<em class="field__hint">{{ field.help_text }}</em>{% endif %}
+                {% if field.errors %}<em class="field__error">{{ field.errors.0 }}</em>{% endif %}
+            </label>
+            {% endfor %}
+            <button class="btn btn--primary" type="submit">Создать доступ</button>
+        </form>
+        <div class="panel__note">
+            <strong>Роли</strong>
+            <p><b>Администратор</b> — полный доступ и управление сотрудниками.<br>
+               <b>Оператор</b> — создание и изменение записей.<br>
+               <b>Аналитик</b> — просмотр и отчёты.<br>
+               <b>Наблюдатель</b> — только чтение.</p>
+        </div>
+    </aside>
+</div>
+{% endblock %}

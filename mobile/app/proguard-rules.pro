@@ -1,0 +1,7 @@
+-dkeep class com.squareup.** { *; }
+-keep class okhttp3.** { *; }
+-keep class kotlinx.coroutines.** { *; }
+-keep class retrofit2.** { *; }
+-ddontwarn okhttp3.**
+-ddontwarn okio.**
+-ddontwarn javax.annotation.**

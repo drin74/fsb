@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">ФСБ · Единый реестр</string>
+    <string name="login_title">ФСБ</string>
+    <string name="login_subtitle">Единый реестр</string>
+    <string name="login_kicker">Защищённый контур · служебный доступ</string>
+    <string name="login_heading">Единая система учёта и обработки данных</string>
+    <string name="login_subheading">Веб-интерфейс, настольное приложение и Android-клиент работают с общей базой MySQL через REST API.</string>
+    <string name="login_username">Логин</string>
+    <string name="login_password">Пароль</string>
+    <string name="login_button">Войти в реестр</string>
+    <string name="login_error">Не удалось выполнить вход.</string>
+    <string name="login_demo">Демонстрационные учётные записи: admin / Admin123!, operator / Operator123!, analyst / Analyst123!</string>
+    <string name="main_title">Реестр записей</string>
+    <string name="main_search_hint">ФИО, ИНН, СНИЛС, телефон…</string>
+    <string name="fab_add">Добавить запись</string>
+    <string name="empty_clients">Ничего не найдено. Добавьте новую запись или выполните импорт.</string>
+    <string name="client_archive_title">Запись ФСБ</string>
+    <string name="client_edit">Изменить</string>
+    <string name="client_archive">В архив</string>
+    <string name="client_contacts">Контакты</string>
+    <string name="client_events">События</string>
+    <string name="client_data">Дополнительные сведения</string>
+    <string name="add_contact">Добавить контакт</string>
+    <string name="add_event">Добавить событие</string>
+    <string name="contact_kind">Тип</string>
+    <string name="contact_value">Телефон, email или ник</string>
+    <string name="event_type">Тип события</string>
+    <string name="event_title">Заголовок события</string>
+    <client_name>Запись</client_name>
+</resources>

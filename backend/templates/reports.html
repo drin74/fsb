@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Отчёты{% endblock %}
+{% block eyebrow %}Аналитика{% endblock %}
+{% block page_title %}Отчёты и аналитика{% endblock %}
+{% block topbar_actions %}
+<a class="btn btn--primary" href="{% url 'client_export' %}">Выгрузить реестр CSV</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid--stats">
+    <div class="stat-card"><div class="stat-card__label">Всего записей</div><div class="stat-card__value">{{ stats.total }}</div><div class="stat-card__meta">в активном реестре</div></div>
+    <div class="stat-card"><div class="stat-card__label">Высокий риск</div><div class="stat-card__value">{{ stats.high_risk }}</div><div class="stat-card__meta">требуют внимания</div></div>
+    <div class="stat-card"><div class="stat-card__label">На проверке</div><div class="stat-card__value">{{ stats.checking }}</div><div class="stat-card__meta">в работе</div></div>
+    <div class="stat-card"><div class="stat-card__label">Новые за неделю</div><div class="stat-card__value">+{{ stats.new_week }}</div><div class="stat-card__meta">прирост реестра</div></div>
+</div>
+
+<div class="grid grid--2">
+    <section class="panel">
+        <header class="panel__head"><div><div class="panel__eyebrow">Структура</div><h2>Записи по статусам</h2></div></header>
+        <div class="bars">
+            {% for bar in status_bars %}
+            <div class="bar-row">
+                <div class="bar-row__top"><span class="badge badge--{{ bar.code }}">{{ bar.label }}</span><strong>{{ bar.count }}</strong></div>
+                <div class="bar"><span class="bar__fill bar__fill--{{ bar.tone }}" style="width: {{ bar.percent }}%"></span></div>
+            </div>
+            {% empty %}<p class="muted">Нет данных.</p>{% endfor %}
+        </div>
+    </section>
+    <section class="panel">
+        <header class="panel__head"><div><div class="panel__eyebrow">Оценка</div><h2>Распределение рисков</h2></div></header>
+        <div class="bars">
+            {% for bar in risk_bars %}
+            <div class="bar-row">
+                <div class="bar-row__top"><span class="badge badge--risk-{{ bar.code }}">{{ bar.label }}</span><strong>{{ bar.count }}</strong></div>
+                <div class="bar"><span class="bar__fill bar__fill--{{ bar.tone }}" style="width: {{ bar.percent }}%"></span></div>
+            </div>
+            {% empty %}<p class="muted">Нет данных.</p>{% endfor %}
+        </div>
+    </section>
+</div>
+
+<div class="grid grid--2">
+    <section class="panel">
+        <header class="panel__head"><div><div class="panel__eyebrow">Каналы</div><h2>Источники поступлений</h2></div><a class="panel__link" href="{% url 'sources' %}">Управление →</a></header>
+        <div class="table-wrap">
+            <table class="table table--compact">
+                <thead><tr><th>Источник</th><th>Тип</th><th>Записей</th></tr></thead>
+                <tbody>
+                {% for source in sources %}
+                <tr><td>{{ source.name }}</td><td><span class="tag tag--muted">{{ source.get_kind_display }}</span></td><td class="mono">{{ source.clients_count }}</td></tr>
+                {% empty %}<tr><td colspan="3" class="empty">Нет источников.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel__head"><div><div class="panel__eyebrow">Экспорт</div><h2>Готовые выгрузки</h2></div></header>
+        <div class="quick">
+            <a class="quick__item" href="{% url 'client_export' %}"><span>⇩</span><strong>Полный реестр</strong><small>CSV, UTF-8 с BOM</small></a>
+            <a class="quick__item" href="{% url 'client_export' %}?risk_level=high"><span>!</span><strong>Высокий риск</strong><small>Только критичные записи</small></a>
+            <a class="quick__item" href="{% url 'client_export' %}?status=checking"><span>?</span><strong>На проверке</strong><small>Очередь оператора</small></a>
+            <a class="quick__item" href="{% url 'client_export' %}?status=watch"><span>◎</span><strong>Наблюдение</strong><small>Контрольная группа</small></a>
+        </div>
+        <div class="panel__note">
+            <strong>Регламент</strong>
+            <p>Выгрузка персональных данных фиксируется в журнале аудита с указанием сотрудника, объёма и времени.</p>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

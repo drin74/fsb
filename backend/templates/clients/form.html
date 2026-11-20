@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{% if client %}Редактирование{% else %}Новая запись{% endif %}{% endblock %}
+{% block eyebrow %}Реестр записей{% endblock %}
+{% block page_title %}{% if client %}Редактирование: {{ client.short_name }}{% else %}Новая запись{% endif %}{% endblock %}
+{% block topbar_actions %}
+<a class="btn btn--ghost" href="{% if client %}{% url 'client_detail' client.pk %}{% else %}{% url 'client_list' %}{% endif %}">Отмена</a>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="panel form form--client">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="message message--error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <header class="panel__head">
+        <div>
+            <div class="panel__eyebrow">Анкета физического лица</div>
+            <h2>Персональные данные</h2>
+        </div>
+        <span class="panel__hint">Поля со * обязательны</span>
+    </header>
+
+    <div class="form__section">
+        <h3 class="form__section-title">Идентификация</h3>
+        <div class="form__grid">
+            {% for field in form %}
+                {% if field.name == 'last_name' or field.name == 'first_name' or field.name == 'middle_name' or field.name == 'birth_date' or field.name == 'gender' or field.name == 'citizenship' %}
+                <label class="field {% if field.name == 'last_name' or field.name == 'first_name' %}field--required{% endif %}">
+                    <span>{{ field.label }}</span>
+                    {{ field }}
+                    {% if field.errors %}<em class="field__error">{{ field.errors.0 }}</em>{% endif %}
+                </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="form__section">
+        <h3 class="form__section-title">Документы и реквизиты</h3>
+        <div class="form__grid">
+            {% for field in form %}
+                {% if field.name == 'inn' or field.name == 'snils' or field.name == 'passport_series' or field.name == 'passport_number' or field.name == 'passport_issued_by' or field.name == 'passport_issue_date' %}
+                <label class="field">
+                    <span>{{ field.label }}</span>
+                    {{ field }}
+                    {% if field.errors %}<em class="field__error">{{ field.errors.0 }}</em>{% endif %}
+                </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="form__section">
+        <h3 class="form__section-title">Контакты и адреса</h3>
+        <div class="form__grid">
+            {% for field in form %}
+                {% if field.name == 'phone' or field.name == 'email' or field.name == 'address_registration' or field.name == 'address_actual' %}
+                <label class="field {% if field.name == 'address_registration' or field.name == 'address_actual' %}field--full{% endif %}">
+                    <span>{{ field.label }}</span>
+                    {{ field }}
+                    {% if field.errors %}<em class="field__error">{{ field.errors.0 }}</em>{% endif %}
+                </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="form__section">
+        <h3 class="form__section-title">Учёт и контроль</h3>
+        <div class="form__grid">
+            {% for field in form %}
+                {% if field.name == 'status' or field.name == 'risk_level' or field.name == 'source' or field.name == 'tags' or field.name == 'photo' or field.name == 'notes' %}
+                <label class="field {% if field.name == 'notes' %}field--full{% endif %}">
+                    <span>{{ field.label }}</span>
+                    {{ field }}
+                    {% if field.help_text %}<em class="field__hint">{{ field.help_text }}</em>{% endif %}
+                    {% if field.errors %}<em class="field__error">{{ field.errors.0 }}</em>{% endif %}
+                </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer class="form__actions">
+        <a class="btn btn--ghost" href="{% if client %}{% url 'client_detail' client.pk %}{% else %}{% url 'client_list' %}{% endif %}">Отмена</a>
+        <button class="btn btn--primary" type="submit">{% if client %}Сохранить изменения{% else %}Создать запись{% endif %}</button>
+    </footer>
+</form>
+{% endblock %}

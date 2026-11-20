@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FSB" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/fsbgold</item>
+        <item name="colorPrimaryVariant">@color/fsbbg</item>
+        <item name="colorSecondary">@color/fsbcyan</item>
+        <item name="colorSecondaryVariant">@color/fsbbg</item>
+        <item name="colorSurface">@color/fsbpanel</item>
+        <item name="colorSurfaceVariant">@color/fsbpanel</item>
+        <item name="colorOnSurface">@color/fsbtext</item>
+        <item name="colorOnSurfaceVariant">@color/fsbmuted</item>
+        <item name="colorOutline">@color/fsbline</item>
+        <item name="android:statusBarColor">@color/fsbbg</item>
+        <item name="android:navigationBarColor">@color/fsbbg</item>
+        <item name="android:windowBackground">@color/fsbbg</item>
+    </style>
+</resources>

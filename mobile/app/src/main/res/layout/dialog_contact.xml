@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/fsbbg"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Тип"
+        android:textColor="@color/fsbdim"
+        android:textSize="10.5sp"
+        android:letterSpacing="0.08" />
+
+    <Spinner
+        android:id="@+id/spKind"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/fsbpanel"
+        android:textColor="@color/fsbtext" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="Значение"
+        android:textColor="@color/fsbdim"
+        android:textSize="10.5sp"
+        android:letterSpacing="0.08" />
+
+    <EditText
+        android:id="@+id/etValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Телефон, email или ник"
+        android:inputType="text"
+        android:backgroundTint="@color/fsbpanel"
+        android:textColor="@color/fsbtext"
+        android:textColorHint="@color/fsbdim"
+        android:textSize="13sp"
+        android:imeOptions="actionDone" />
+</LinearLayout>
