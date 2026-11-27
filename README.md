@@ -132,3 +132,26 @@ python main.py
 Адрес API берётся из desktop\config.json (api_base). По умолчанию: http://127.0.0.1:8010/api.
 Если бэкенд работает на этом же ПК — менять не нужно.
 Если бэкенд на другом ПК/сервере — замените на http://<IP_сервера>:8010/api.
+
+\
+\
+\
+Ошибка означает, что MySQL не запущен/недоступен по адресу из backend\.env (обычно 127.0.0.1:3308 при настройке через Docker). Бэкенд сам БД не поднимает — её нужно запустить отдельно.
+
+Что сделать на другом ПК (ваш случай)
+Вы уже в backend с активным .venv. Проще всего поднять БД через Docker:
+
+Установите Docker Desktop (если ещё не установлен) и запустите его.
+В корне проекта (где лежит docker-compose.yml, у вас это C:\Users\user\Desktop\fsb-main) выполните:
+docker compose up -d db
+Подождите пару секунд, пока MySQL станет готов (можно проверить: docker compose ps).
+Вернитесь в backend и выполните миграции/демо-данные (один раз на чистую БД):
+cd C:\Users\user\Desktop\fsb-main\backend
+.\.venv\Scripts\activate
+python manage.py migrate
+python manage.py seed_demo
+Запустите сервер:
+python manage.py runserver 127.0.0.1:8010
+Для доступа с других устройств в сети: python manage.py runserver 0.0.0.0:8010.
+После этого откройте http://127.0.0.1:8010/ — логин admin / Admin123!.
+
